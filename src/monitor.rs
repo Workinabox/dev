@@ -39,7 +39,7 @@ pub fn run(
         ),
     );
 
-    let token = std::env::var("GITHUB_TOKEN")
+    let token = std::env::var("GITHUB_WORKINABOX_TOKEN")
         .or_else(|_| std::env::var("GH_TOKEN"))
         .unwrap_or_default();
 
@@ -47,7 +47,7 @@ pub fn run(
 
     if !has_token {
         reporter.error(
-            "Missing GITHUB_TOKEN (or GH_TOKEN). Repo status will likely be rate-limited/unauthenticated."
+            "Missing GITHUB_WORKINABOX_TOKEN (or GH_TOKEN). Repo status will likely be rate-limited/unauthenticated."
                 .to_string(),
         );
     } else {
