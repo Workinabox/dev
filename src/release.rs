@@ -160,13 +160,13 @@ pub fn run(args: ReleaseArgs, reporter: DynReporter) -> Result<()> {
         }
     }
 
-    let token = std::env::var("GITHUB_TOKEN")
+    let token = std::env::var("GITHUB_WORKINABOX_TOKEN")
         .or_else(|_| std::env::var("GH_TOKEN"))
         .unwrap_or_default();
 
     if !args.dry_run && token.is_empty() {
         bail!(
-            "missing GITHUB_TOKEN (or GH_TOKEN). This is required to poll release assets after tagging."
+            "missing GITHUB_WORKINABOX_TOKEN (or GH_TOKEN). This is required to poll release assets after tagging."
         );
     }
 
