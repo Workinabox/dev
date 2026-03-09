@@ -21,7 +21,7 @@ pub struct MonitorArgs {
     pub poll_interval: Duration,
 }
 
-const REPOS: [&str; 2] = [".github", "dev"];
+const REPOS: [&str; 4] = [".github", "dev", "ui", "backend"];
 
 pub fn run(
     args: MonitorArgs,
