@@ -124,7 +124,7 @@ fn refresh_rows_incremental(
             .get_default_branch(repo)
             .unwrap_or_else(|_| "main".to_string());
 
-        let action = match gh.get_latest_workflow_run(repo) {
+        let action = match gh.get_latest_workflow_run(repo, &default_branch) {
             Ok(Some(run)) => {
                 if run.status == "completed" {
                     match run.conclusion.as_deref() {
