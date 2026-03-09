@@ -58,7 +58,7 @@ pub fn run(
 
     let mut rows = placeholder_rows();
     let _ = tx.send(UiEvent::SetRepos { rows: rows.clone() });
-    refresh_rows_incremental(&gh, &mut rows, &tx, true)?;
+    refresh_rows_incremental(&gh, &mut rows, &tx, &reporter, true)?;
 
     while !shutdown.load(Ordering::SeqCst) {
         let mut slept = Duration::ZERO;
@@ -72,7 +72,7 @@ pub fn run(
             break;
         }
 
-        match refresh_rows_incremental(&gh, &mut rows, &tx, false) {
+        match refresh_rows_incremental(&gh, &mut rows, &tx, &reporter, false) {
             Ok(()) => {
                 if has_token {
                     reporter.ok("OK".to_string());
@@ -104,6 +104,7 @@ fn refresh_rows_incremental(
     gh: &GitHub,
     rows: &mut [RepoStatusRow],
     tx: &Sender<UiEvent>,
+    reporter: &DynReporter,
     show_loading: bool,
 ) -> Result<()> {
     if show_loading {
@@ -138,7 +139,11 @@ fn refresh_rows_incremental(
                     ActionState::Running
                 }
             }
-            Ok(None) | Err(_) => ActionState::Unknown,
+            Ok(None) => ActionState::Unknown,
+            Err(e) => {
+                reporter.error(format!("{repo}: {e:#}"));
+                ActionState::Unknown
+            }
         };
 
         let release_tag = match gh.get_latest_release_tag(repo) {
