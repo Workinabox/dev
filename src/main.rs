@@ -1,6 +1,7 @@
 mod git;
 mod github;
 mod monitor;
+mod org;
 mod release;
 mod reporter;
 mod tui;

@@ -11,6 +11,7 @@ use crossbeam_channel::Sender;
 
 use crate::{
     github::GitHub,
+    org::ORG_REPOS,
     reporter::DynReporter,
     tui::{ActionState, RepoStatusRow, UiEvent},
 };
@@ -20,8 +21,6 @@ pub struct MonitorArgs {
     pub owner: String,
     pub poll_interval: Duration,
 }
-
-const REPOS: [&str; 4] = [".github", "dev", "ui", "backend"];
 
 pub fn run(
     args: MonitorArgs,
@@ -34,7 +33,7 @@ pub fn run(
         format!(
             "owner={}\nrepos={}\nrefresh={}s",
             args.owner,
-            REPOS.len(),
+            ORG_REPOS.len(),
             args.poll_interval.as_secs()
         ),
     );
@@ -88,7 +87,7 @@ pub fn run(
 }
 
 fn placeholder_rows() -> Vec<RepoStatusRow> {
-    REPOS
+    ORG_REPOS
         .iter()
         .map(|repo| RepoStatusRow {
             name: (*repo).to_string(),
@@ -116,7 +115,7 @@ fn refresh_rows_incremental(
         });
     }
 
-    for (i, repo) in REPOS.iter().enumerate() {
+    for (i, repo) in ORG_REPOS.iter().enumerate() {
         if let Some(row) = rows.get_mut(i) {
             row.loading = show_loading;
         }
