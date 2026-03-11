@@ -2,6 +2,11 @@
 
 The developer and orchestrator repo of workinabox.
 
+## Commands
+
+- `monitor` shows live organization status across `.github`, `dev`, `ui`, `backend`, and `app`
+- `release` tags and coordinates synchronized releases across the sibling repos
+
 ## GitHub Token
 
 The `monitor` and `release` commands call the GitHub API at runtime. They read a Personal Access Token from your shell environment:
