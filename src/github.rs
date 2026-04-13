@@ -112,7 +112,7 @@ impl GitHub {
 
         if resp.status() == StatusCode::UNAUTHORIZED || resp.status() == StatusCode::FORBIDDEN {
             bail!(
-                "GitHub API auth failed (status {}). Set GITHUB_TOKEN/GH_TOKEN with access to {}/{}.",
+                "GitHub API auth failed (status {}). Set GITHUB_WORKINABOX_TOKEN/GH_TOKEN with access to {}/{}.",
                 resp.status(),
                 self.owner,
                 repo
@@ -145,7 +145,7 @@ impl GitHub {
 
         if resp.status() == StatusCode::UNAUTHORIZED || resp.status() == StatusCode::FORBIDDEN {
             bail!(
-                "GitHub API auth failed (status {}). Set GITHUB_TOKEN/GH_TOKEN with access to {}/{}.",
+                "GitHub API auth failed (status {}). Set GITHUB_WORKINABOX_TOKEN/GH_TOKEN with access to {}/{}.",
                 resp.status(),
                 self.owner,
                 repo
@@ -178,7 +178,7 @@ impl GitHub {
 
         if resp.status() == StatusCode::UNAUTHORIZED || resp.status() == StatusCode::FORBIDDEN {
             bail!(
-                "GitHub API auth failed (status {}). Set GITHUB_TOKEN/GH_TOKEN with access to {}/{}.",
+                "GitHub API auth failed (status {}). Set GITHUB_WORKINABOX_TOKEN/GH_TOKEN with access to {}/{}.",
                 resp.status(),
                 self.owner,
                 repo
@@ -211,7 +211,7 @@ impl GitHub {
 
         if resp.status() == StatusCode::UNAUTHORIZED || resp.status() == StatusCode::FORBIDDEN {
             bail!(
-                "GitHub API auth failed (status {}). Set GITHUB_TOKEN/GH_TOKEN with access to {}/{}.",
+                "GitHub API auth failed (status {}). Set GITHUB_WORKINABOX_TOKEN/GH_TOKEN with access to {}/{}.",
                 resp.status(),
                 self.owner,
                 repo
