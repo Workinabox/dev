@@ -4,7 +4,7 @@ The developer and orchestrator repo of workinabox.
 
 ## Commands
 
-- `monitor` shows live organization status across `.github`, `dev`, `ui`, `backend`, and `app`
+- `monitor` shows live organization status across `.github`, `dev`, `backend`, `frontend`, `website`, `app`, and `assets`
 - `release` tags and coordinates synchronized releases across the sibling repos
 
 ## GitHub Token
