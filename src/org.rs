@@ -1,1 +1,3 @@
-pub const ORG_REPOS: [&str; 4] = [".github", "dev", "backend", "app"];
+pub const ORG_REPOS: [&str; 7] = [
+    ".github", "dev", "backend", "frontend", "website", "app", "assets",
+];
