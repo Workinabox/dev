@@ -7,6 +7,18 @@ The developer and orchestrator repo of workinabox.
 - `monitor` shows live organization status across `.github`, `dev`, `backend`, `frontend`, `website`, `app`, and `assets`
 - `release` tags and coordinates synchronized releases across the sibling repos
 
+## Local stack
+
+Run the whole app (Postgres + backend + frontend) locally with Docker Compose, from the
+workspace root (the directory holding the sibling repos):
+
+```sh
+docker compose -f dev/local/docker-compose.yml up
+```
+
+See [local/README.md](local/README.md) for ports, the first-run notes, where data is stored,
+and how to reset.
+
 ## GitHub Token
 
 The `monitor` and `release` commands call the GitHub API at runtime. They read a Personal Access Token from your shell environment:

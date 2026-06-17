@@ -1,0 +1,70 @@
+# Local full-stack dev environment: Postgres + Rust backend + React frontend (nginx).
+#
+#   docker compose -f dev/local/docker-compose.yml up --build
+#
+# See README.md. Build contexts reach the sibling repos via ../../; Postgres data and git
+# repos are stored under ./.data (gitignored).
+name: wiab-local
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: wiab
+      POSTGRES_PASSWORD: wiab
+      POSTGRES_DB: wiab
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./.data/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U wiab -d wiab"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  backend:
+    build:
+      context: ../../backend
+      dockerfile: Dockerfile.dev
+    environment:
+      DATABASE_URL: postgres://wiab:wiab@db:5432/wiab
+      WIAB_PERSISTENCE: postgres
+      WIAB_MEDIASOUP_LISTEN_IP: 0.0.0.0
+      WIAB_MEDIASOUP_ANNOUNCED_ADDRESS: 127.0.0.1
+      WIAB_GIT_ROOT: /wiab-git
+      RUST_LOG: wiab=info,tower_http=info
+    ports:
+      - "8080:8080"   # HTTPS API + WebSocket
+      - "2222:2222"   # git SSH transport
+    volumes:
+      - ../../backend:/app
+      - wiab-target:/app/target
+      - wiab-cargo:/usr/local/cargo/registry
+      - ./.data/git:/wiab-git
+    depends_on:
+      db:
+        condition: service_healthy
+    # The first build compiles Rust + cmake native deps and can take tens of minutes, hence
+    # the long start_period before the container is considered unhealthy.
+    healthcheck:
+      test: ["CMD-SHELL", "curl -ksf https://localhost:8080/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 1800s
+
+  frontend:
+    build:
+      context: ../../frontend
+      args:
+        VITE_USE_STUB: "false"
+    ports:
+      - "3000:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  wiab-target:
+  wiab-cargo:
