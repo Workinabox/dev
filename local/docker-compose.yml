@@ -33,7 +33,18 @@ services:
       WIAB_MEDIASOUP_LISTEN_IP: 0.0.0.0
       WIAB_MEDIASOUP_ANNOUNCED_ADDRESS: 127.0.0.1
       WIAB_GIT_ROOT: /wiab-git
-      RUST_LOG: wiab=info,tower_http=info
+      RUST_LOG: wiab=info,tower_http=info,authbox::email=info
+      # Public origin the browser uses (drives cookie Secure, email + OIDC redirect URLs).
+      WIAB_BASE_URL: http://localhost:3000
+      # Password-reset email → Mailpit (view it at http://localhost:8025).
+      WIAB_SMTP_HOST: mailpit
+      WIAB_SMTP_PORT: "1025"
+      WIAB_SMTP_FROM: no-reply@workinabox.local
+      # Enterprise SSO via the mock IdP is OFF by default. To try it, set
+      # WIAB_AUTH_OIDC_ENABLED=true and point WIAB_OIDC_ISSUER at the mock — note the mock
+      # must be reachable at the SAME host from both the browser and the backend (e.g. run
+      # the backend on the host, or expose the mock via a shared hostname), since the issuer
+      # in its discovery doc follows the request host.
     ports:
       - "8080:8080"   # HTTPS API + WebSocket
       - "2222:2222"   # git SSH transport
@@ -64,6 +75,19 @@ services:
     depends_on:
       backend:
         condition: service_healthy
+
+  # Catches outbound email (password-reset links). Web UI: http://localhost:8025
+  mailpit:
+    image: axllent/mailpit
+    ports:
+      - "8025:8025"
+
+  # Mock OIDC provider for trying enterprise SSO locally (see the backend env note above).
+  # Discovery: http://localhost:9090/default/.well-known/openid-configuration
+  oidc-mock:
+    image: ghcr.io/navikt/mock-oauth2-server:2.1.10
+    ports:
+      - "9090:8080"
 
 volumes:
   wiab-target:
