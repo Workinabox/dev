@@ -24,3 +24,6 @@ target
 # Added by cargo
 
 /target
+
+# Local dev stack runtime state (Postgres data + git repos)
+local/.data/
