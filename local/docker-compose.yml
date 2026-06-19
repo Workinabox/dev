@@ -33,18 +33,26 @@ services:
       WIAB_MEDIASOUP_LISTEN_IP: 0.0.0.0
       WIAB_MEDIASOUP_ANNOUNCED_ADDRESS: 127.0.0.1
       WIAB_GIT_ROOT: /wiab-git
-      RUST_LOG: wiab=info,tower_http=info,authbox::email=info
+      RUST_LOG: wiab=info,tower_http=info,authbox_inf=info
       # Public origin the browser uses (drives cookie Secure, email + OIDC redirect URLs).
       WIAB_BASE_URL: http://localhost:3000
-      # Password-reset email → Mailpit (view it at http://localhost:8025).
+      # Email defaults to Resend (set RESEND_API_KEY + WIAB_EMAIL_FROM in oidc.env). To use
+      # the bundled Mailpit catcher instead (view at http://localhost:8025), set
+      # WIAB_EMAIL_PROVIDER=smtp in oidc.env — these SMTP vars then point at Mailpit.
+      # NB: WIAB_EMAIL_FROM is intentionally NOT set here — `environment:` overrides
+      # `env_file:`, so it must live in oidc.env to be usable by Resend (verified domain).
       WIAB_SMTP_HOST: mailpit
       WIAB_SMTP_PORT: "1025"
-      WIAB_SMTP_FROM: no-reply@workinabox.local
       # Enterprise SSO via the mock IdP is OFF by default. To try it, set
       # WIAB_AUTH_OIDC_ENABLED=true and point WIAB_OIDC_ISSUER at the mock — note the mock
       # must be reachable at the SAME host from both the browser and the backend (e.g. run
       # the backend on the host, or expose the mock via a shared hostname), since the issuer
       # in its discovery doc follows the request host.
+    # Real Entra/OIDC credentials live in an untracked oidc.env (see oidc.env.example).
+    # required: false → if the file is absent, enterprise SSO simply stays off.
+    env_file:
+      - path: ./oidc.env
+        required: false
     ports:
       - "8080:8080"   # HTTPS API + WebSocket
       - "2222:2222"   # git SSH transport

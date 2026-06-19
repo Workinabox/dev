@@ -27,3 +27,6 @@ target
 
 # Local dev stack runtime state (Postgres data + git repos)
 local/.data/
+
+# Real OIDC/Entra credentials for the local stack (copy from oidc.env.example).
+local/oidc.env
