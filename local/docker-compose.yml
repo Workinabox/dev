@@ -33,6 +33,15 @@ services:
       WIAB_MEDIASOUP_LISTEN_IP: 0.0.0.0
       WIAB_MEDIASOUP_ANNOUNCED_ADDRESS: 127.0.0.1
       WIAB_GIT_ROOT: /wiab-git
+      # Local models (Llama LLM, Whisper STT). Fetch them first with
+      # `backend/scripts/fetch-models.sh` into ~/.local/share/wiab (mounted below), then
+      # export the enable flags + filenames before `docker compose up`. Default off so the
+      # stack boots without model files present; an enabled-but-missing model aborts startup.
+      WIAB_DATA_DIR: /var/lib/wiab
+      WIAB_LLAMA_ENABLED: ${WIAB_LLAMA_ENABLED:-false}
+      WIAB_WHISPER_ENABLED: ${WIAB_WHISPER_ENABLED:-false}
+      WIAB_LLAMA_MODEL_FILE: ${WIAB_LLAMA_MODEL_FILE:-}
+      WIAB_WHISPER_MODEL_FILE: ${WIAB_WHISPER_MODEL_FILE:-}
       RUST_LOG: wiab=info,tower_http=info,authbox_inf=info
       # Public origin the browser uses (drives cookie Secure, email + OIDC redirect URLs).
       WIAB_BASE_URL: http://localhost:3000
@@ -61,6 +70,7 @@ services:
       - wiab-target:/app/target
       - wiab-cargo:/usr/local/cargo/registry
       - ./.data/git:/wiab-git
+      - ${HOME}/.local/share/wiab:/var/lib/wiab
     depends_on:
       db:
         condition: service_healthy
