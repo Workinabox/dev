@@ -45,6 +45,8 @@ services:
       RUST_LOG: wiab=info,tower_http=info,authbox_inf=info
       # Public origin the browser uses (drives cookie Secure, email + OIDC redirect URLs).
       WIAB_BASE_URL: http://localhost:3000
+      # Enable self-service signup locally (shows the "Create an account" link). Off by default.
+      WIAB_AUTH_LOCAL_SIGNUP: "true"
       # Email defaults to Resend (set RESEND_API_KEY + WIAB_EMAIL_FROM in oidc.env). To use
       # the bundled Mailpit catcher instead (view at http://localhost:8025), set
       # WIAB_EMAIL_PROVIDER=smtp in oidc.env — these SMTP vars then point at Mailpit.
