@@ -53,24 +53,22 @@ dev/local/.data/git        # bare git repos (WIAB_GIT_ROOT)
 ```
 
 Migrations run automatically on backend boot (refinery). To start completely fresh, stop the
-stack and delete that directory:
+stack and clear the data — but **recreate the empty subdirectories**. On Docker Desktop / WSL2,
+deleting the bind-mount source dirs themselves makes the next `up` fail with
+`no such file or directory` (Docker can't find them to mount). The dirs are root-owned, so the
+simplest no-`sudo` way is a throwaway root container that wipes and recreates them in one shot:
 
 ```sh
 docker compose -f dev/local/docker-compose.yml down
-sudo rm -rf dev/local/.data   # sudo: Postgres owns its data files as its own uid
+docker run --rm -v "$PWD/dev/local/.data:/data" alpine \
+  sh -c 'rm -rf /data/postgres /data/git && mkdir -p /data/postgres /data/git'
+docker compose -f dev/local/docker-compose.yml up -d
 ```
 
-Always wipe **both** subdirectories together. A repo is stored in two paired places — a row in
-the Postgres `repo` table and an on-disk `R-<n>.git` bare repo — so deleting only one leaves
-orphaned repos and id collisions on re-create. Deleting all of `.data` does this correctly.
-(Don't use `docker compose down -v` for this: it removes the `wiab-target`/`wiab-cargo` compile
-caches, not the bind-mounted data.)
-
-If you'd rather not use `sudo`, delete it from a throwaway root container instead:
-
-```sh
-docker run --rm -v "$PWD/dev/local/.data:/data" alpine rm -rf /data/postgres /data/git
-```
+Always clear **both** `postgres` and `git` together. A repo is stored in two paired places — a
+row in the Postgres `repo` table and an on-disk `R-<n>.git` bare repo — so clearing only one
+leaves orphaned repos and id collisions on re-create. (Don't use `docker compose down -v` for
+this: it removes the `wiab-target`/`wiab-cargo` compile caches, not the bind-mounted data.)
 
 On the next `up` the backend re-seeds the default org/owner and logs a fresh bootstrap token
 (see [Logging in](#logging-in)).
