@@ -9,15 +9,30 @@ docker compose -f dev/local/docker-compose.yml up --build
 
 Run it from the workspace root (the directory holding `backend/`, `frontend/`, and `dev/`).
 
-| Service  | URL / address                          | Notes |
-|----------|----------------------------------------|-------|
-| frontend | http://localhost:3000                  | the app — open this |
-| backend  | https://localhost:8080                 | HTTPS with a self-signed cert (use `curl -k`) |
-| backend  | ssh://localhost:2222                   | git SSH transport |
-| db       | postgres://wiab:wiab@localhost:5432/wiab | Postgres 16 |
+| Service   | URL / address                            | Notes |
+|-----------|------------------------------------------|-------|
+| frontend  | http://localhost:3000                    | the app — open this |
+| backend   | https://localhost:8080                   | HTTPS with a self-signed cert (use `curl -k`) |
+| backend   | ssh://localhost:2222                     | git SSH transport |
+| db        | postgres://wiab:wiab@localhost:5432/wiab | Postgres 16 |
+| mailpit   | http://localhost:8025                    | dev inbox — catches outgoing email (e.g. password-reset links). SMTP is internal on `mailpit:1025` |
+| oidc-mock | http://localhost:9090                    | mock OIDC provider for enterprise SSO (off unless enabled). Discovery: `/default/.well-known/openid-configuration` |
 
 The frontend calls the backend through nginx's `/api` proxy, so it talks to the real backend
 (not the in-app stub).
+
+## Starting and stopping
+
+Run all of these from the workspace root:
+
+```sh
+docker compose -f dev/local/docker-compose.yml up          # start (foreground; Ctrl-C stops)
+docker compose -f dev/local/docker-compose.yml up -d       # start detached (background)
+docker compose -f dev/local/docker-compose.yml up --build  # rebuild images first (after a Dockerfile/nginx change)
+docker compose -f dev/local/docker-compose.yml ps          # show status
+docker compose -f dev/local/docker-compose.yml logs -f     # follow logs (append a service name, e.g. backend)
+docker compose -f dev/local/docker-compose.yml down        # stop and remove containers (data + compile caches kept)
+```
 
 ## First run is slow
 
@@ -44,6 +59,21 @@ stack and delete that directory:
 docker compose -f dev/local/docker-compose.yml down
 sudo rm -rf dev/local/.data   # sudo: Postgres owns its data files as its own uid
 ```
+
+Always wipe **both** subdirectories together. A repo is stored in two paired places — a row in
+the Postgres `repo` table and an on-disk `R-<n>.git` bare repo — so deleting only one leaves
+orphaned repos and id collisions on re-create. Deleting all of `.data` does this correctly.
+(Don't use `docker compose down -v` for this: it removes the `wiab-target`/`wiab-cargo` compile
+caches, not the bind-mounted data.)
+
+If you'd rather not use `sudo`, delete it from a throwaway root container instead:
+
+```sh
+docker run --rm -v "$PWD/dev/local/.data:/data" alpine rm -rf /data/postgres /data/git
+```
+
+On the next `up` the backend re-seeds the default org/owner and logs a fresh bootstrap token
+(see [Logging in](#logging-in)).
 
 ## Logging in
 
