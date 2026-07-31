@@ -23,6 +23,23 @@ services:
       timeout: 3s
       retries: 30
 
+  nats:
+    # Message broker between the backend and its agent teams. JetStream is on so a
+    # durable work stream survives a broker restart; a team must not lose an issue
+    # because NATS bounced.
+    image: nats:2-alpine
+    command: ["--jetstream", "--store_dir", "/data", "--http_port", "8222"]
+    ports:
+      - "4222:4222"   # client connections
+      - "8222:8222"   # monitoring endpoints (/healthz, /varz)
+    volumes:
+      - ./.data/nats:/data
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:8222/healthz"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
   backend:
     build:
       context: ../../backend
@@ -33,6 +50,8 @@ services:
       WIAB_MEDIASOUP_LISTEN_IP: 0.0.0.0
       WIAB_MEDIASOUP_ANNOUNCED_ADDRESS: 127.0.0.1
       WIAB_GIT_ROOT: /wiab-git
+      WIAB_NATS_ENABLED: "true"
+      WIAB_NATS_URL: nats://nats:4222
       # Local models (Llama LLM, Whisper STT). Fetch them first with
       # `backend/scripts/fetch-models.sh` into ~/.local/share/wiab (mounted below), then
       # export the enable flags + filenames before `docker compose up`. Default off so the
@@ -75,6 +94,8 @@ services:
       - ${HOME}/.local/share/wiab:/var/lib/wiab
     depends_on:
       db:
+        condition: service_healthy
+      nats:
         condition: service_healthy
     # The first build compiles Rust + cmake native deps and can take tens of minutes, hence
     # the long start_period before the container is considered unhealthy.
