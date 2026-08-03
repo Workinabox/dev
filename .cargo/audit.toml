@@ -1,0 +1,13 @@
+# Exceptions for `cargo audit`. Every entry needs a written reason: the audit runs in CI so a
+# new advisory fails the build, and an undocumented ignore quietly converts that back to
+# silence.
+#
+# Nothing is ignored today — every advisory affecting this workspace was fixable by updating.
+# The file exists so the next exception has an obvious home and cannot be added without one.
+
+[advisories]
+ignore = []
+
+# Reported as warnings, which do not fail the build, so they stay visible rather than silenced:
+#   RUSTSEC-2026-0002  `lru` IterMut unsoundness. Pinned by ratatui 0.29; it cannot be updated
+#                      independently, and the CLI never touches the affected API.
