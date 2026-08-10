@@ -1,6 +1,6 @@
 use crate::git::Repo;
 use crate::github::GitHub;
-use crate::org::ORG_REPOS;
+use crate::org::RELEASE_REPOS;
 use crate::reporter::DynReporter;
 use anyhow::{Context, Result, bail};
 use semver::Version;
@@ -97,7 +97,7 @@ pub fn run(args: ReleaseArgs, reporter: DynReporter) -> Result<()> {
 
     // Tag every repo in the workspace in sync. Only `dev` currently publishes
     // GitHub release assets that we need to wait for.
-    let repos: Vec<Repo> = ORG_REPOS
+    let repos: Vec<Repo> = RELEASE_REPOS
         .iter()
         .map(|name| Repo::new(&args.owner, *name, repos_root.join(name)))
         .collect();
