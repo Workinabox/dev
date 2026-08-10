@@ -41,3 +41,10 @@
 - Favor smaller commits. Single responsability that concentrate on one concept/part/story/feature/struct
 - Single responsability principle always
 - Never EVER deploy anything to anywhere without being explicitly told to. Things like terraform apply for example.
+
+<!-- The bullets above are the shared core, identical across every repo's CLAUDE.md — edit all copies together. Below is dev-specific. -->
+
+## dev-specific
+
+- `dev` is the org's "centre of gravity": a change in another repo that affects org orchestration should update `dev` in the same body of work. The repo lists live in `src/org.rs` — `ORG_REPOS` (all ten, for `monitor`) and `RELEASE_REPOS` (the synchronized-release subset). Keep them in step with the actual org.
+- `release` tags and pushes real tags across `RELEASE_REPOS` — it is a release action; don't run it without an explicit instruction.

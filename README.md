@@ -4,8 +4,8 @@ The developer and orchestrator repo of workinabox.
 
 ## Commands
 
-- `monitor` shows live organization status across `.github`, `dev`, `backend`, `frontend`, `website`, `app`, and `assets`
-- `release` tags and coordinates synchronized releases across the sibling repos
+- `monitor` shows live organization status across all ten org repos (`.github`, `backend`, `frontend`, `app`, `website`, `sw-dev-team`, `iac`, `dev`, `docs`, `assets`)
+- `release` tags and coordinates a synchronized release across the release subset (`RELEASE_REPOS` in `src/org.rs`): `.github`, `dev`, `backend`, `frontend`, `website`, `app`, `assets`. `sw-dev-team` versions independently (its own semver + Python wheel scheme) and `docs`/`iac` do not cut synchronized tags, so they are monitored but not release-tagged.
 
 ## Local stack
 
