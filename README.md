@@ -21,11 +21,15 @@ and how to reset.
 
 ## GitHub Token
 
-The `monitor` and `release` commands call the GitHub API at runtime. They read a Personal Access Token from your shell environment:
+The `monitor` and `release` commands call the GitHub API at runtime. They read a token from `GITHUB_WORKINABOX_TOKEN` or `GH_TOKEN`. The repo ships an `.envrc` for [direnv](https://direnv.net) that sets `GH_TOKEN` from your GitHub CLI login. One-time setup:
 
 ```sh
-export GITHUB_WORKINABOX_TOKEN=ghp_yourtoken
+# install direnv (apt install direnv / brew install direnv) and add its hook to your shell
+gh auth login
+direnv allow      # in this directory
 ```
+
+Without direnv, export `GH_TOKEN=$(gh auth token)` yourself.
 
 Without it, the monitor will run but hit GitHub's unauthenticated rate limit (60 req/hour). The release command will fail if the token is missing and `--dry-run` is not set.
 
